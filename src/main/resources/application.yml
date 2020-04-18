@@ -1,0 +1,42 @@
+server:
+  port: 8040
+spring:
+  application:
+    name: gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        cluster-name: BJ
+        namespace: 87980947-d66c-4ee5-a8b0-3b17222c464d
+        metadata:
+          version: 1.0
+    gateway:
+      discovery:
+        locator:
+          # 让gateway在注册中心发现其他微服务组件
+          enabled: true
+      routes:
+        - id: user_route
+          uri: lb://user-center
+          predicates:
+            - Path=/users/**
+        - id: content_route
+          uri: lb://content-center
+          predicates:
+            - Path=/shares/**,/admin/**
+  zipkin:
+    base-url: http://localhost:9411
+    discoveryClientEnabled: false
+  sleuth:
+    sampler:
+      #抽样率，默认是0.1（10%）
+      probability: 1.0
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
